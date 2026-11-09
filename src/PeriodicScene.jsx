@@ -23,6 +23,8 @@ function makeTile(p) {
   return new CSS3DObject(el)
 }
 
+const targetsFor = (name, n) => Array.from({ length: n }, (_, i) => layouts[name](i, n))
+
 export default function PeriodicScene({ people }) {
   const host = useRef()
   const targets = useRef([])
@@ -30,7 +32,7 @@ export default function PeriodicScene({ people }) {
   const camGoal = useRef(null)
 
   const setLayout = (name) => {
-    targets.current = people.map((_, i) => layouts[name](i, people.length))
+    targets.current = targetsFor(name, people.length)
     // grid is deep: view it at an angle so the 5 layers don't hide each other
     camGoal.current = name === 'grid' ? new Vector3(3200, 500, 3400) : new Vector3(0, 0, 3600)
   }
@@ -45,7 +47,7 @@ export default function PeriodicScene({ people }) {
     const controls = new OrbitControls(camera, renderer.domElement)
 
     const tiles = people.map((p) => { const t = makeTile(p); scene.add(t); return t })
-    setLayout('table')
+    targets.current = targetsFor('table', people.length)
     tiles.forEach((t, i) => { t.position.copy(targets.current[i].position); t.quaternion.copy(targets.current[i].quaternion) })
 
     let raf
