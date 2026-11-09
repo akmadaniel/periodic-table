@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { PerspectiveCamera, Scene, Vector3 } from 'three'
 import { CSS3DObject, CSS3DRenderer } from 'three/examples/jsm/renderers/CSS3DRenderer.js'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls.js'
 import { netWorthColor } from './color'
 import { layouts } from './layouts'
 
@@ -23,7 +23,8 @@ function makeTile(p) {
   return new CSS3DObject(el)
 }
 
-const targetsFor = (name, n) => Array.from({ length: n }, (_, i) => layouts[name](i, n))
+const UP = new Vector3(0, 1, 0)
+const targetsFor =(name, n) => Array.from({ length: n }, (_, i) => layouts[name](i, n))
 
 export default function PeriodicScene({ people }) {
   const host = useRef()
@@ -44,9 +45,10 @@ export default function PeriodicScene({ people }) {
     const renderer = new CSS3DRenderer()
     renderer.setSize(innerWidth, innerHeight)
     host.current.appendChild(renderer.domElement)
-    const controls = new OrbitControls(camera, renderer.domElement)
-    // scene is ~3000 units wide: default speeds spin/zoom far too fast
-    Object.assign(controls, { rotateSpeed: 0.4, zoomSpeed: 0.4, minDistance: 1500, maxDistance: 6000, enablePan: false })
+    // same controls and limits as the three.js css3d_periodictable demo
+    const controls = new TrackballControls(camera, renderer.domElement)
+    controls.minDistance = 500
+    controls.maxDistance = 6000
 
     const tiles = people.map((p) => { const t = makeTile(p); scene.add(t); return t })
     targets.current = targetsFor('table', people.length)
@@ -60,6 +62,7 @@ export default function PeriodicScene({ people }) {
       })
       if (camGoal.current) {
         camera.position.lerp(camGoal.current, 0.06)
+        camera.up.lerp(UP, 0.06).normalize() // undo any roll from trackball dragging
         if (camera.position.distanceTo(camGoal.current) < 5) camGoal.current = null
       }
       controls.update()
