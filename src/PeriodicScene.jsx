@@ -16,7 +16,7 @@ function makeTile(p) {
   const top = document.createElement('div'); top.className = 'top'
   top.append(Object.assign(document.createElement('span'), { textContent: p.country }),
              Object.assign(document.createElement('span'), { textContent: p.age }))
-  const img = Object.assign(document.createElement('img'), { src: p.photo, alt: p.name })
+  const img = Object.assign(document.createElement('img'), { src: p.photo, alt: p.name, draggable: false })
   const name = Object.assign(document.createElement('div'), { className: 'name', textContent: p.name })
   const rest = Object.assign(document.createElement('div'), { textContent: `${p.interest} · ${p.worth}` })
   el.append(top, img, name, rest)
