@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { PerspectiveCamera, Scene, Vector3 } from 'three'
 import { CSS3DObject, CSS3DRenderer } from 'three/examples/jsm/renderers/CSS3DRenderer.js'
 import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls.js'
@@ -24,38 +24,18 @@ function makeTile(p) {
 }
 
 const UP = new Vector3(0, 1, 0)
-// slot order: sheet order, or highest net worth first. Tile i goes to the slot of person i.
-const targetsFor = (name, people, sorted) => {
-  const n = people.length
-  const order = people.map((_, i) => i)
-  if (sorted) order.sort((a, b) => people[b].worthNum - people[a].worthNum)
-  const out = []
-  order.forEach((person, slot) => { out[person] = layouts[name](slot, n) })
-  return out
-}
+const targetsFor =(name, n) => Array.from({ length: n }, (_, i) => layouts[name](i, n))
 
 export default function PeriodicScene({ people }) {
   const host = useRef()
   const targets = useRef([])
-  const view = useRef({ name: 'table', sorted: false })
-  const [sorted, setSorted] = useState(false)
 
   const camGoal = useRef(null)
 
-  const update = (patch) => {
-    Object.assign(view.current, patch)
-    targets.current = targetsFor(view.current.name, people, view.current.sorted)
-  }
-
   const setLayout = (name) => {
-    update({ name })
+    targets.current = targetsFor(name, people.length)
     // grid is deep: view it at an angle so the 5 layers don't hide each other
     camGoal.current = name === 'grid' ? new Vector3(3200, 500, 3400) : new Vector3(0, 0, 3600)
-  }
-
-  const toggleSort = () => {
-    update({ sorted: !view.current.sorted })
-    setSorted(view.current.sorted)
   }
 
   useEffect(() => {
@@ -71,7 +51,7 @@ export default function PeriodicScene({ people }) {
     controls.maxDistance = 6000
 
     const tiles = people.map((p) => { const t = makeTile(p); scene.add(t); return t })
-    targets.current = targetsFor(view.current.name, people, view.current.sorted)
+    targets.current = targetsFor('table', people.length)
     tiles.forEach((t, i) => { t.position.copy(targets.current[i].position); t.quaternion.copy(targets.current[i].quaternion) })
 
     let raf
@@ -104,7 +84,6 @@ export default function PeriodicScene({ people }) {
         {Object.keys(layouts).map((n) => (
           <button key={n} onClick={() => setLayout(n)}>{n.toUpperCase()}</button>
         ))}
-        <button onClick={toggleSort}>{sorted ? 'UNSORT' : 'SORT BY NET WORTH'}</button>
         <div className="legend">
           Net Worth:
           <i style={{ background: 'rgb(239,48,34)' }} />&lt; $100K
