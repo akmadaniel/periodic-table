@@ -13,4 +13,3 @@ html, body, #root { margin: 0; height: 100%; background: #000; color: #fff; font
 .bar button:hover { background: #8ff3; }
 .legend { margin-top: 10px; font-size: 12px; }
 .legend i { display: inline-block; width: 12px; height: 12px; margin: 0 4px 0 12px; vertical-align: middle; }
-.msg { position: fixed; top: 16px; width: 100%; text-align: center; }

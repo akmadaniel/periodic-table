@@ -25,7 +25,6 @@ function makeTile(p) {
 
 export default function PeriodicScene({ people }) {
   const host = useRef()
-  const layoutRef = useRef('table')
   const targets = useRef([])
 
   const camGoal = useRef(null)
