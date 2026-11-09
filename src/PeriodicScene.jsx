@@ -45,6 +45,8 @@ export default function PeriodicScene({ people }) {
     renderer.setSize(innerWidth, innerHeight)
     host.current.appendChild(renderer.domElement)
     const controls = new OrbitControls(camera, renderer.domElement)
+    // scene is ~3000 units wide: default speeds spin/zoom far too fast
+    Object.assign(controls, { rotateSpeed: 0.4, zoomSpeed: 0.4, minDistance: 1500, maxDistance: 6000, enablePan: false })
 
     const tiles = people.map((p) => { const t = makeTile(p); scene.add(t); return t })
     targets.current = targetsFor('table', people.length)
