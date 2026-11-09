@@ -26,3 +26,13 @@ export const layouts = {
   // 10 wide x 4 tall x 5 deep
   grid: (i) => at(((i % 10) - 4.5) * 220, -(Math.floor(i / 10) % 4 - 1.5) * 300, (Math.floor(i / 40) - 2) * 800),
 }
+
+// Target spot for every person. Sheet order, or highest net worth first when sorted.
+export const targetsFor = (name, people, sorted) => {
+  const n = people.length
+  const order = people.map((_, i) => i)
+  if (sorted) order.sort((a, b) => people[b].worthNum - people[a].worthNum)
+  const out = []
+  order.forEach((person, slot) => { out[person] = layouts[name](slot, n) })
+  return out
+}
