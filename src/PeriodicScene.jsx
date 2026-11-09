@@ -102,8 +102,8 @@ export default function PeriodicScene({ people }) {
           aria-label="Sort by net worth"
           title={sorted ? 'Sorted by net worth (click to undo)' : 'Sort by net worth'}
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M7 4v16M3 16l4 4 4-4M17 20V4M13 8l4-4 4 4" />
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M6 3v17M2.5 16.5L6 20l3.5-3.5M11 4h10M11 8h8M11 12h6M11 16h4M11 20h2" />
           </svg>
         </button>
         <div className="legend">
