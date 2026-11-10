@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { PerspectiveCamera, Scene, Vector3 } from 'three'
 import { CSS3DObject, CSS3DRenderer } from 'three/examples/jsm/renderers/CSS3DRenderer.js'
 import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls.js'
 import { netWorthColor } from './color'
-import { layouts, targetsFor } from './layouts'
+import { layouts } from './layouts'
 
 function makeTile(p) {
   const el = document.createElement('div')
@@ -24,29 +24,18 @@ function makeTile(p) {
 }
 
 const UP = new Vector3(0, 1, 0)
+const targetsFor =(name, n) => Array.from({ length: n }, (_, i) => layouts[name](i, n))
 
 export default function PeriodicScene({ people }) {
   const host = useRef()
   const targets = useRef([])
-  const view = useRef({ name: 'table', sorted: false })
-  const [sorted, setSorted] = useState(false)
 
   const camGoal = useRef(null)
 
-  const update = (patch) => {
-    Object.assign(view.current, patch)
-    targets.current = targetsFor(view.current.name, people, view.current.sorted)
-  }
-
   const setLayout = (name) => {
-    update({ name })
+    targets.current = targetsFor(name, people.length)
     // grid is deep: view it at an angle so the 5 layers don't hide each other
     camGoal.current = name === 'grid' ? new Vector3(3200, 500, 3400) : new Vector3(0, 0, 3600)
-  }
-
-  const toggleSort = () => {
-    update({ sorted: !view.current.sorted })
-    setSorted(view.current.sorted)
   }
 
   useEffect(() => {
@@ -62,7 +51,7 @@ export default function PeriodicScene({ people }) {
     controls.maxDistance = 6000
 
     const tiles = people.map((p) => { const t = makeTile(p); scene.add(t); return t })
-    targets.current = targetsFor(view.current.name, people, view.current.sorted)
+    targets.current = targetsFor('table', people.length)
     tiles.forEach((t, i) => { t.position.copy(targets.current[i].position); t.quaternion.copy(targets.current[i].quaternion) })
 
     let raf
@@ -95,17 +84,6 @@ export default function PeriodicScene({ people }) {
         {Object.keys(layouts).map((n) => (
           <button key={n} onClick={() => setLayout(n)}>{n.toUpperCase()}</button>
         ))}
-        <button
-          onClick={toggleSort}
-          className={sorted ? 'on' : ''}
-          aria-pressed={sorted}
-          aria-label="Sort by net worth"
-          title={sorted ? 'Sorted by net worth (click to undo)' : 'Sort by net worth'}
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M6 3v17M2.5 16.5L6 20l3.5-3.5M11 4h10M11 8h8M11 12h6M11 16h4M11 20h2" />
-          </svg>
-        </button>
         <div className="legend">
           Net Worth:
           <i style={{ background: 'rgb(239,48,34)' }} />&lt; $100K
