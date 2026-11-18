@@ -8,6 +8,14 @@ const at = (x, y, z, look) => {
   return o
 }
 
+// 4 corners of tetrahedron
+const TET = [
+  new Vector3(1, 1, 1),
+  new Vector3(1, -1, -1),
+  new Vector3(-1, 1, -1),
+  new Vector3(-1, -1, 1),
+].map((v) => v.multiplyScalar(900))
+
 export const layouts = {
   table: (i) => at(((i % 20) - 9.5) * 140, -(Math.floor(i / 20) - 4.5) * 180, 0),
   sphere: (i, n) => {
@@ -25,4 +33,27 @@ export const layouts = {
   },
   // 10 wide x 4 tall x 5 deep
   grid: (i) => at(((i % 10) - 4.5) * 220, -(Math.floor(i / 10) % 4 - 1.5) * 300, (Math.floor(i / 40) - 2) * 800),
+
+  // pyramid
+  pyramid: (i, n) => {
+    const perFace = n/4
+    const face = Math.floor(i/perFace)
+    const slot = i % perFace
+
+    const [A, B, C] = TET.filter((_,k) => k !== face)
+
+    let r = 0
+    while ((r+1) * (r+2) / 2 <= slot) r++
+    const c = slot - (r * (r+1)) / 2
+    const rows = 10
+
+    const t = (r + 0.5) / rows
+    const s = (c + 0.5) / (r + 1)
+    const p = A.clone().multiplyScalar(1 - t)
+      .addScaledVector(B, t * (1 - s))
+      .addScaledVector(C, t * s)
+
+    const out = TET[face].clone().negate().normalize().multiplyScalar(500)
+    return at(p.x, p.y, p.z, p.clone().add(out))
+  }
 }
